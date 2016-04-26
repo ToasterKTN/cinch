@@ -102,14 +102,19 @@ module Cinch
         private
         def send_data(fd)
           @io.advise(:sequential)
+          pos=0 # Store our current filepos
           while chunk = @io.read(1024)
-            # send 1024 bytes 
+            # send 1024 bytes
             fd.syswrite(chunk)
-            # and wait for an answer. 
-            bytes=fd.sysread(8)
-            # we should check this answer and start where thi number end.. as far as i understud the wp.
+            # and wait for an answer.
+            Timeout.timeout(10) do # After a timeout retry send same data ??
+              bytes=fd.sysread(4) # Get pos on file of our client
+              pos=bytes.unpack("N").first # Set our pos to the same as our client.
+            end
+            seek(pos) # Seek new place in File
           end
         end
+      end
     end
   end
 end
