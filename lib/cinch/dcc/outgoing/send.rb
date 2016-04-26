@@ -103,7 +103,7 @@ module Cinch
         def send_data(fd)
           @io.advise(:sequential)
           pos=0 # Store our current filepos
-          while chunk = @io.read(1024)
+          while chunk = @io.read(4096)
             # send 1024 bytes
             fd.syswrite(chunk)
             # and wait for an answer.
