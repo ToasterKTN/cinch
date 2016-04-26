@@ -76,7 +76,7 @@ module Cinch
           begin
             fd = nil
             Timeout.timeout(30) do
-              fd, _ = @socket.accept
+              fd = @socket.accept
             end
             send_data(fd)
             fd.close
@@ -102,14 +102,14 @@ module Cinch
         private
         def send_data(fd)
           @io.advise(:sequential)
-
-          while chunk = @io.read(8096)
-            rs, ws = IO.select([fd], [fd])
-            rs.first.recv(8096)   unless rs.empty?
-            ws.first.write(chunk) unless ws.empty?
+          while chunk = @io.read(1024)
+            # send 1024 bytes 
+            fd.syswrite(chunk)
+            # and wait for an answer. 
+            bytes=fd.sysread(8)
+            # we should check this answer and start where thi number end.. as far as i understud the wp.
           end
         end
-      end
     end
   end
 end
